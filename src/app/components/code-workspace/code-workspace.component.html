@@ -1,0 +1,321 @@
+<div
+  class="flex h-full min-h-0 min-w-0 flex-1 flex-col border border-white/10 bg-[#1e1e2e]/95 shadow-[0_0_60px_rgb(0_0_0_/_0.4)] backdrop-blur-xl sm:rounded-lg"
+  role="application"
+  aria-label="IDE"
+>
+  <div
+    class="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#181825]/98 px-2 py-2 sm:px-3"
+  >
+    <div class="min-w-0 truncate font-mono text-[11px] text-[#a6adc8] sm:text-xs">
+      <span class="text-[#6c7086]">{{ statusModeLabel() }}</span>
+      <span class="mx-1 text-[#45475a]">—</span>
+      <span class="text-[#cdd6f4]">{{ activeTitle() }}</span>
+      <span class="hidden text-[#6c7086] sm:inline">
+        — {{ language.t().ide.windowTitle }}</span
+      >
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      <app-language-toggle />
+      <div
+        class="hidden h-2 w-14 shrink-0 items-center justify-end gap-1 sm:flex"
+        aria-hidden="true"
+      >
+        <span class="h-2 w-2 rounded-full bg-[#f38ba8]"></span>
+        <span class="h-2 w-2 rounded-full bg-[#f9e2af]"></span>
+        <span class="h-2 w-2 rounded-full bg-[#a6e3a1]"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
+    <aside
+      class="max-h-[40vh] overflow-y-auto border-b border-white/10 bg-[#181825]/85 lg:max-h-none lg:border-b-0 lg:border-r"
+      [attr.aria-label]="language.t().ide.explorer"
+    >
+      <div
+        class="sticky top-0 z-[1] bg-[#181825]/95 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#6c7086]"
+      >
+        {{ language.t().ide.explorer }}
+      </div>
+      <div class="px-1 pb-3 font-mono text-[13px]">
+        @for (row of explorerRows; track $index) {
+          @if (row.type === 'folder') {
+            <div
+              class="flex items-center gap-1 py-0.5 text-[#bac2de]"
+              [style.padding-left.px]="8 + row.depth * 10"
+            >
+              <span class="text-[10px] text-[#6c7086]">&#9660;</span>
+              <span class="truncate">{{ row.name }}</span>
+            </div>
+          } @else if (row.id) {
+            <div [style.padding-left.px]="8 + row.depth * 10">
+              <button
+                type="button"
+                class="flex w-full max-w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#89b4fa]"
+                [class.bg-[#313244]]="isActiveFile(row.id)"
+                [class.text-white]="isActiveFile(row.id)"
+                [class.text-[#bac2de]]="!isActiveFile(row.id)"
+                [class.hover:bg-white/5]="!isActiveFile(row.id)"
+                (click)="openFile(row.id)"
+              >
+                <span
+                  class="h-3 w-3 shrink-0 rounded-sm"
+                  [class]="fileIconClass(row.id)"
+                  aria-hidden="true"
+                ></span>
+                <span class="min-w-0 truncate">{{
+                  language.t().codeFiles[row.id].label
+                }}</span>
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </aside>
+
+    <div
+      class="flex min-h-[min(52dvh,560px)] min-w-0 flex-1 flex-col bg-[#1e1e2e] lg:min-h-0"
+    >
+      <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          class="flex min-h-[40px] flex-nowrap gap-0 overflow-x-auto overscroll-x-contain border-b border-white/10 bg-[#181825]/50"
+          role="tablist"
+          [attr.aria-label]="activeTitle()"
+        >
+          @for (id of openTabs(); track id) {
+            <div
+              role="tab"
+              class="group flex max-w-[min(240px,45vw)] shrink-0 items-stretch border-r border-white/10 font-mono text-[11px] transition-colors sm:text-xs"
+              [class.border-t-2]="isActiveFile(id)"
+              [class.border-t-[#89b4fa]]="isActiveFile(id)"
+              [class.bg-[#1e1e2e]]="isActiveFile(id)"
+              [class.bg-transparent]="!isActiveFile(id)"
+              [attr.aria-selected]="isActiveFile(id)"
+            >
+              <button
+                type="button"
+                class="min-w-0 flex-1 truncate px-2 py-2 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#89b4fa]"
+                [class.text-[#cdd6f4]]="isActiveFile(id)"
+                [class.text-[#6c7086]]="!isActiveFile(id)"
+                (click)="selectTab(id)"
+              >
+                {{ language.t().codeFiles[id].label }}
+              </button>
+              <button
+                type="button"
+                class="shrink-0 px-2 py-2 text-[#6c7086] transition-colors hover:bg-white/10 hover:text-[#cdd6f4] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#89b4fa]"
+                [attr.aria-label]="'Close ' + language.t().codeFiles[id].label"
+                (click)="closeTab($event, id)"
+              >
+                &times;
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="flex min-h-0 flex-1 overflow-auto">
+          <div
+            class="sticky left-0 z-[1] select-none border-r border-white/10 bg-[#181825]/40 py-3 pr-2 pl-2 text-right font-mono text-[11px] leading-6 text-[#6c7086] sm:pl-3 sm:text-[12px]"
+            aria-hidden="true"
+          >
+            @for (n of lineNumbers(); track $index) {
+              <div class="leading-6">{{ n }}</div>
+            }
+          </div>
+          <div
+            class="min-w-0 flex-1 overflow-x-auto py-3 pr-3 font-mono text-[12px] leading-6 text-[#cdd6f4] sm:pr-4 sm:text-[13px]"
+          >
+            <div class="whitespace-pre-wrap break-words pl-1">
+              @for (token of highlightedTokens(); track $index) {
+                <span [class]="tokenClass(token.type)">{{ token.text }}</span>
+              }
+              <span
+                class="ml-px inline-block min-h-[1.1em] min-w-[0.55ch] translate-y-[2px] bg-[#89b4fa] align-baseline animate-blink-cursor"
+                aria-hidden="true"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex min-h-[120px] max-h-[38vh] shrink-0 flex-col border-t border-[#2b2b2b] bg-[#181818]"
+        role="region"
+        [attr.aria-label]="language.t().ide.panel.terminal"
+      >
+        <div
+          class="flex h-9 shrink-0 items-stretch justify-between gap-1 border-b border-[#2b2b2b] bg-[#252526]"
+        >
+          <div
+            class="flex min-w-0 flex-1 items-stretch overflow-x-auto text-[12px] text-[#969696]"
+          >
+            <span
+              class="inline-flex cursor-default items-center whitespace-nowrap px-3 hover:bg-[#323232]"
+              tabindex="-1"
+              >{{ language.t().ide.panel.problems }}</span
+            >
+            <span
+              class="inline-flex cursor-default items-center whitespace-nowrap px-3 hover:bg-[#323232]"
+              tabindex="-1"
+              >{{ language.t().ide.panel.output }}</span
+            >
+            <span
+              class="inline-flex cursor-default items-center whitespace-nowrap px-3 hover:bg-[#323232]"
+              tabindex="-1"
+              >{{ language.t().ide.panel.debugConsole }}</span
+            >
+            <span
+              class="inline-flex cursor-default items-center whitespace-nowrap border-b-2 border-[#007fd4] bg-[#1e1e1e] px-3 text-[#cccccc] hover:bg-[#323232]"
+              tabindex="-1"
+              aria-current="true"
+              >{{ language.t().ide.panel.terminal }}</span
+            >
+            <span
+              class="inline-flex cursor-default items-center whitespace-nowrap px-3 hover:bg-[#323232]"
+              tabindex="-1"
+              >{{ language.t().ide.panel.ports }}</span
+            >
+          </div>
+          <div
+            class="flex shrink-0 items-center border-l border-[#2b2b2b] text-[#cccccc]"
+          >
+            <button
+              type="button"
+              class="flex h-9 w-8 items-center justify-center hover:bg-[#323232] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#007fd4]"
+              [attr.title]="language.t().ide.panel.newTerminal"
+              [attr.aria-label]="language.t().ide.panel.newTerminal"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              class="flex h-9 w-8 items-center justify-center hover:bg-[#323232] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#007fd4]"
+              [attr.title]="language.t().ide.panel.splitTerminal"
+              [attr.aria-label]="language.t().ide.panel.splitTerminal"
+            >
+              <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <rect x="1" y="2" width="6" height="12" rx="0.5" opacity="0.9" />
+                <rect x="9" y="2" width="6" height="12" rx="0.5" opacity="0.9" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="flex h-9 w-8 items-center justify-center hover:bg-[#323232] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#007fd4]"
+              [attr.title]="language.t().ide.panel.killTerminal"
+              [attr.aria-label]="language.t().ide.panel.killTerminal"
+            >
+              <svg
+                class="h-3.5 w-3.5 opacity-90"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 2h4l1 1h3v1H2V3h3l1-1zm-1 3v8a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5H5zm2 1h1v6H7V6zm3 0h1v6h-1V6z"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="flex h-9 w-8 items-center justify-center hover:bg-[#323232] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#007fd4]"
+              [attr.title]="language.t().ide.panel.closePanel"
+              [attr.aria-label]="language.t().ide.panel.closePanel"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+        <div
+          class="min-h-0 flex-1 overflow-y-auto px-3 py-2 font-mono text-[11px] leading-5 sm:text-[12px] sm:leading-5"
+          role="document"
+        >
+          <div
+            class="flex min-h-[1.25rem] flex-wrap items-center gap-x-1 gap-y-1"
+            role="img"
+            [attr.aria-label]="language.t().ide.prompt.ariaLabel"
+          >
+            <span class="inline-flex items-center text-[#cba6f7]">{{
+              language.t().ide.prompt.user
+            }}</span>
+            <span class="inline-flex items-center text-[#c0caf5]">{{
+              language.t().ide.prompt.inRepo
+            }}</span>
+            <span class="inline-flex items-center text-[#e0af68]">{{
+              language.t().ide.prompt.repoName
+            }}</span>
+            <span class="inline-flex items-center text-[#c0caf5]">{{
+              language.t().ide.prompt.on
+            }}</span>
+            <span class="inline-flex items-center gap-1 text-[#a6e3a1]">
+              <svg
+                class="block h-[1cap] w-[1cap] shrink-0 self-center"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="6" y1="3" x2="6" y2="15" />
+                <circle cx="18" cy="6" r="3" />
+                <circle cx="6" cy="18" r="3" />
+                <path d="M18 9a9 9 0 0 1-9 9" />
+              </svg>
+              {{ language.t().ide.statusBranch }}
+            </span>
+            <span class="inline-flex items-center text-[#a6e3a1]">{{
+              language.t().ide.prompt.gitAdd
+            }}</span>
+            <span class="inline-flex items-center text-[#eb98af]">/</span>
+            <span class="inline-flex items-center text-[#f7768e]">{{ language.t().ide.prompt.gitDel }}</span>
+            <span class="inline-flex items-center text-[#c0caf5]">{{
+              language.t().ide.prompt.gitDirty
+            }}</span>
+            <span class="inline-flex items-center text-[#c0caf5]">{{
+              language.t().ide.prompt.via
+            }}</span>
+            <span class="inline-flex items-center gap-1 text-[#a6e3a1]">
+              <svg
+                class="block h-[1cap] w-[1cap] shrink-0 self-center"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <polygon points="8,1.5 13.5,4.75 13.5,11.25 8,14.5 2.5,11.25 2.5,4.75" />
+              </svg>
+              {{ language.t().ide.prompt.nodeVersion }}
+            </span>
+          </div>
+          <div class="mt-2 flex items-center gap-1.5 text-[12px] sm:text-[13px]">
+            <span class="font-semibold text-[#c0caf5]" aria-hidden="true">&#x276F;</span>
+            <span
+              class="inline-block h-4 w-px shrink-0 bg-[#c0caf5] animate-blink-cursor"
+              aria-hidden="true"
+            ></span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-white/10 bg-[#2563eb] px-3 py-1.5 font-mono text-[10px] text-white sm:text-xs"
+      >
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="inline-flex items-center gap-1">
+            <span class="opacity-80" aria-hidden="true">&#9082;</span>
+            {{ language.t().ide.statusBranch }}
+          </span>
+          <span>{{ language.t().ide.statusErrors }}</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <span>{{ language.t().ide.statusEncoding }}</span>
+          <span>{{ statusModeLabel() }}</span>
+          <span class="inline-flex items-center gap-1 opacity-90">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-[#a6e3a1]"></span>
+            {{ language.t().ide.statusLive }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

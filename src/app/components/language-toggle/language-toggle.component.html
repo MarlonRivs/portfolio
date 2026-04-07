@@ -1,0 +1,28 @@
+<div
+  class="inline-flex items-center rounded-lg border border-white/10 bg-[#181825]/80 p-0.5 font-mono text-xs shadow-lg backdrop-blur-md"
+  role="group"
+  [attr.aria-label]="language.t().language.aria"
+>
+  <button
+    type="button"
+    class="rounded-md px-3 py-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#89b4fa]"
+    [class.bg-[#313244]]="language.lang() === 'en'"
+    [class.text-white]="language.lang() === 'en'"
+    [class.text-[#6c7086]]="language.lang() !== 'en'"
+    [class.hover:text-[#cdd6f4]]="language.lang() !== 'en'"
+    (click)="selectEn()"
+  >
+    {{ language.t().language.en }}
+  </button>
+  <button
+    type="button"
+    class="rounded-md px-3 py-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#89b4fa]"
+    [class.bg-[#313244]]="language.lang() === 'es'"
+    [class.text-white]="language.lang() === 'es'"
+    [class.text-[#6c7086]]="language.lang() !== 'es'"
+    [class.hover:text-[#cdd6f4]]="language.lang() !== 'es'"
+    (click)="selectEs()"
+  >
+    {{ language.t().language.es }}
+  </button>
+</div>
