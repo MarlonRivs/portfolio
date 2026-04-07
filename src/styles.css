@@ -16,16 +16,31 @@
 }
 
 html {
+  height: 100%;
+  width: 100%;
   scroll-behavior: smooth;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
+  height: 100%;
+  width: 100%;
   min-height: 100dvh;
   font-family: var(--font-sans);
   background-color: var(--bg-deep);
   color: #cdd6f4;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+}
+
+app-root {
+  display: block;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 ::selection {
@@ -71,4 +86,73 @@ body {
 
 .animate-blink-cursor {
   animation: blink-cursor 1s step-end infinite;
+}
+
+.ide-theme-root {
+  --ide-bg: #1e1e2e;
+  --ide-panel: #181825;
+  --ide-terminal: #181818;
+  --ide-status: #2563eb;
+  --ide-border: rgb(255 255 255 / 0.1);
+  --ide-text: #cdd6f4;
+}
+
+.ide-theme-root[data-theme='catppuccin'] {
+  --ide-bg: #1e1e2e;
+  --ide-panel: #181825;
+  --ide-terminal: #181818;
+  --ide-status: #2563eb;
+  --ide-border: rgb(255 255 255 / 0.1);
+  --ide-text: #cdd6f4;
+}
+
+.ide-theme-root[data-theme='vsDark'] {
+  --ide-bg: #1e1e1e;
+  --ide-panel: #252526;
+  --ide-terminal: #1f1f1f;
+  --ide-status: #007acc;
+  --ide-border: rgb(255 255 255 / 0.12);
+  --ide-text: #d4d4d4;
+}
+
+.ide-theme-root[data-theme='nord'] {
+  --ide-bg: #2e3440;
+  --ide-panel: #3b4252;
+  --ide-terminal: #2b303b;
+  --ide-status: #5e81ac;
+  --ide-border: rgb(216 222 233 / 0.2);
+  --ide-text: #eceff4;
+}
+
+.ide-theme-root[data-theme='light'] {
+  --ide-bg: #f8fafc;
+  --ide-panel: #e2e8f0;
+  --ide-terminal: #f1f5f9;
+  --ide-status: #2563eb;
+  --ide-border: rgb(15 23 42 / 0.15);
+  --ide-text: #1e293b;
+}
+
+.ide-window {
+  background-color: var(--ide-bg) !important;
+  border-color: var(--ide-border) !important;
+  color: var(--ide-text);
+}
+
+.ide-titlebar,
+.ide-explorer {
+  background-color: var(--ide-panel) !important;
+  border-color: var(--ide-border) !important;
+}
+
+.ide-editor {
+  color: var(--ide-text);
+}
+
+.ide-terminal {
+  background-color: var(--ide-terminal) !important;
+}
+
+.ide-statusbar {
+  background-color: var(--ide-status) !important;
 }

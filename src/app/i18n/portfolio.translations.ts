@@ -54,6 +54,22 @@ export interface PortfolioTranslations {
       nodeVersion: string;
       ariaLabel: string;
     };
+    terminal: {
+      welcome: string;
+      placeholder: string;
+      availableCommands: string;
+      pwdPath: string;
+      lsItems: string;
+      gitStatus: string[];
+      unknownCommand: string;
+    };
+    theme: {
+      label: string;
+      catppuccin: string;
+      vsDark: string;
+      nord: string;
+      light: string;
+    };
   };
   codeFiles: Record<PortfolioFileId, CodeFileEntry>;
   language: { en: string; es: string; aria: string };
@@ -720,6 +736,28 @@ export const PORTFOLIO_TRANSLATIONS: Record<PortfolioLang, PortfolioTranslations
         nodeVersion: 'v25.7.0',
         ariaLabel: 'Simulated shell prompt',
       },
+      terminal: {
+        welcome: 'Type help to see available commands.',
+        placeholder: 'Type a command...',
+        availableCommands: 'Available commands: help, clear, pwd, ls, git status',
+        pwdPath: '/home/marlonriv/portfolio',
+        lsItems: 'app  src  package.json  angular.json  README.md',
+        gitStatus: [
+          'On branch main',
+          'Your branch is up to date with origin/main.',
+          'Changes not staged for commit:',
+          '  modified: src/main.ts',
+          '  modified: angular.json',
+        ],
+        unknownCommand: 'Command not found: {command}',
+      },
+      theme: {
+        label: 'Theme',
+        catppuccin: 'Catppuccin',
+        vsDark: 'VS Dark',
+        nord: 'Nord',
+        light: 'Light',
+      },
     },
     codeFiles: {
       hero_controller: {
@@ -805,6 +843,28 @@ export const PORTFOLIO_TRANSLATIONS: Record<PortfolioLang, PortfolioTranslations
         gitDirty: '[!?]',
         nodeVersion: 'v25.7.0',
         ariaLabel: 'Prompt de terminal simulado',
+      },
+      terminal: {
+        welcome: 'Escribe help para ver los comandos disponibles.',
+        placeholder: 'Escribe un comando...',
+        availableCommands: 'Comandos disponibles: help, clear, pwd, ls, git status',
+        pwdPath: '/home/marlonriv/portfolio',
+        lsItems: 'app  src  package.json  angular.json  README.md',
+        gitStatus: [
+          'En la rama main',
+          'Tu rama esta actualizada con origin/main.',
+          'Cambios no preparados para commit:',
+          '  modificado: src/main.ts',
+          '  modificado: angular.json',
+        ],
+        unknownCommand: 'Comando no encontrado: {command}',
+      },
+      theme: {
+        label: 'Tema',
+        catppuccin: 'Catppuccin',
+        vsDark: 'VS Dark',
+        nord: 'Nord',
+        light: 'Claro',
       },
     },
     codeFiles: {

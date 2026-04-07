@@ -1,9 +1,11 @@
 import {
   Component,
   computed,
+  ElementRef,
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 
 import {
@@ -28,6 +30,9 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
   },
 })
 export class CodeWorkspaceComponent {
+  private static readonly TYPING_STEP = 10;
+  private static readonly TYPING_TICK_MS = 6;
+
   protected readonly language = inject(LanguageService);
 
   protected readonly explorerRows = PORTFOLIO_EXPLORER_ROWS;
@@ -39,6 +44,15 @@ export class CodeWorkspaceComponent {
   protected readonly activeTab = signal<PortfolioFileId>(this.defaultFileId);
 
   protected readonly visibleLength = signal(0);
+  protected readonly terminalInput = signal('');
+  protected readonly terminalEntries = signal<string[]>([]);
+  protected readonly terminalHistory = signal<string[]>([]);
+  protected readonly terminalHistoryIndex = signal(-1);
+  protected readonly terminalOutputRef = viewChild<ElementRef<HTMLDivElement>>('terminalOutput');
+  protected readonly activeThemeId = signal<'catppuccin' | 'vsDark' | 'nord' | 'light'>(
+    'catppuccin',
+  );
+  protected readonly availableThemes = computed(() => this.language.t().ide.theme);
 
   private typingIntervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -55,8 +69,8 @@ export class CodeWorkspaceComponent {
       }
 
       let index = 0;
-      const step = 2;
-      const tickMs = 18;
+      const step = CodeWorkspaceComponent.TYPING_STEP;
+      const tickMs = CodeWorkspaceComponent.TYPING_TICK_MS;
 
       this.typingIntervalId = setInterval(() => {
         index = Math.min(full.length, index + step);
@@ -75,6 +89,15 @@ export class CodeWorkspaceComponent {
           this.typingIntervalId = null;
         }
       });
+    });
+
+    effect(() => {
+      const welcome = this.language.t().ide.terminal.welcome;
+      this.terminalEntries.set([welcome]);
+      this.terminalHistory.set([]);
+      this.terminalHistoryIndex.set(-1);
+      this.terminalInput.set('');
+      queueMicrotask(() => this.scrollTerminalToBottom());
     });
   }
 
@@ -137,9 +160,122 @@ export class CodeWorkspaceComponent {
     return this.activeTab() === id;
   }
 
-  protected fileIconClass(id: PortfolioFileId): string {
-    return id === 'contact_blade'
-      ? 'bg-[#cba6f7]'
-      : 'bg-[#74c7ec]';
+  protected isBladeFile(id: PortfolioFileId): boolean {
+    return id === 'contact_blade';
+  }
+
+  protected fileIconPath(id: PortfolioFileId): string {
+    return this.isBladeFile(id)
+      ? 'assets/icons/laravel-icon.png'
+      : 'assets/icons/php.png';
+  }
+
+  protected themeLabel(id: 'catppuccin' | 'vsDark' | 'nord' | 'light'): string {
+    return this.availableThemes()[id];
+  }
+
+  protected setTheme(id: 'catppuccin' | 'vsDark' | 'nord' | 'light'): void {
+    this.activeThemeId.set(id);
+  }
+
+  protected onThemeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.setTheme(target.value as 'catppuccin' | 'vsDark' | 'nord' | 'light');
+  }
+
+  protected updateTerminalInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.terminalInput.set(target.value);
+  }
+
+  protected onTerminalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.executeTerminalCommand(this.terminalInput());
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.navigateTerminalHistory(-1);
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.navigateTerminalHistory(1);
+    }
+  }
+
+  private navigateTerminalHistory(direction: -1 | 1): void {
+    const history = this.terminalHistory();
+    if (history.length === 0) {
+      return;
+    }
+    const current = this.terminalHistoryIndex();
+    if (direction === -1) {
+      const next = current === -1 ? history.length - 1 : Math.max(current - 1, 0);
+      this.terminalHistoryIndex.set(next);
+      this.terminalInput.set(history[next]!);
+      return;
+    }
+    if (current === -1) {
+      return;
+    }
+    const next = current + 1;
+    if (next >= history.length) {
+      this.terminalHistoryIndex.set(-1);
+      this.terminalInput.set('');
+      return;
+    }
+    this.terminalHistoryIndex.set(next);
+    this.terminalInput.set(history[next]!);
+  }
+
+  private executeTerminalCommand(rawInput: string): void {
+    const command = rawInput.trim();
+    if (!command) {
+      return;
+    }
+    const prompt = `${this.language.t().ide.prompt.user}@${this.language.t().ide.prompt.repoName}:~$ ${command}`;
+    this.terminalEntries.update((entries) => [...entries, prompt]);
+    this.terminalHistory.update((history) => [...history, command].slice(-30));
+    this.terminalHistoryIndex.set(-1);
+    this.terminalInput.set('');
+
+    const output = this.runCommand(command);
+    if (output.length > 0) {
+      this.terminalEntries.update((entries) => [...entries, ...output]);
+    }
+    queueMicrotask(() => this.scrollTerminalToBottom());
+  }
+
+  private runCommand(command: string): string[] {
+    const terminal = this.language.t().ide.terminal;
+    const normalized = command.toLowerCase().replace(/\s+/g, ' ');
+
+    if (normalized === 'help') {
+      return [terminal.availableCommands];
+    }
+    if (normalized === 'clear') {
+      this.terminalEntries.set([]);
+      return [];
+    }
+    if (normalized === 'pwd') {
+      return [terminal.pwdPath];
+    }
+    if (normalized === 'ls') {
+      return [terminal.lsItems];
+    }
+    if (normalized === 'git status') {
+      return terminal.gitStatus;
+    }
+    return [terminal.unknownCommand.replace('{command}', command)];
+  }
+
+  private scrollTerminalToBottom(): void {
+    const element = this.terminalOutputRef()?.nativeElement;
+    if (!element) {
+      return;
+    }
+    element.scrollTop = element.scrollHeight;
   }
 }

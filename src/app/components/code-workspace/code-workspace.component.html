@@ -1,10 +1,11 @@
 <div
-  class="flex h-full min-h-0 min-w-0 flex-1 flex-col border border-white/10 bg-[#1e1e2e]/95 shadow-[0_0_60px_rgb(0_0_0_/_0.4)] backdrop-blur-xl sm:rounded-lg"
+  class="ide-theme-root ide-window flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border border-white/10 bg-[#1e1e2e]/95 shadow-[0_0_60px_rgb(0_0_0_/_0.4)] backdrop-blur-xl sm:rounded-lg"
   role="application"
   aria-label="IDE"
+  [attr.data-theme]="activeThemeId()"
 >
   <div
-    class="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#181825]/98 px-2 py-2 sm:px-3"
+    class="ide-titlebar flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#181825]/98 px-2 py-2 sm:px-3"
   >
     <div class="min-w-0 truncate font-mono text-[11px] text-[#a6adc8] sm:text-xs">
       <span class="text-[#6c7086]">{{ statusModeLabel() }}</span>
@@ -15,6 +16,18 @@
       >
     </div>
     <div class="flex shrink-0 items-center gap-2">
+      <label class="sr-only" for="themeSelect">{{ availableThemes().label }}</label>
+      <select
+        id="themeSelect"
+        class="rounded border border-white/15 bg-[#11111b] px-2 py-1 font-mono text-[11px] text-[#cdd6f4] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#89b4fa]"
+        [value]="activeThemeId()"
+        (change)="onThemeChange($event)"
+      >
+        <option value="catppuccin">{{ themeLabel('catppuccin') }}</option>
+        <option value="vsDark">{{ themeLabel('vsDark') }}</option>
+        <option value="nord">{{ themeLabel('nord') }}</option>
+        <option value="light">{{ themeLabel('light') }}</option>
+      </select>
       <app-language-toggle />
       <div
         class="hidden h-2 w-14 shrink-0 items-center justify-end gap-1 sm:flex"
@@ -27,9 +40,9 @@
     </div>
   </div>
 
-  <div class="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
+  <div class="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
     <aside
-      class="max-h-[40vh] overflow-y-auto border-b border-white/10 bg-[#181825]/85 lg:max-h-none lg:border-b-0 lg:border-r"
+      class="ide-explorer max-h-[40vh] overflow-y-auto border-b border-white/10 bg-[#181825]/85 lg:max-h-none lg:border-b-0 lg:border-r"
       [attr.aria-label]="language.t().ide.explorer"
     >
       <div
@@ -58,11 +71,11 @@
                 [class.hover:bg-white/5]="!isActiveFile(row.id)"
                 (click)="openFile(row.id)"
               >
-                <span
-                  class="h-3 w-3 shrink-0 rounded-sm"
-                  [class]="fileIconClass(row.id)"
-                  aria-hidden="true"
-                ></span>
+                <img
+                  class="h-4 w-4 shrink-0 object-contain"
+                  [src]="fileIconPath(row.id)"
+                  [alt]="isBladeFile(row.id) ? 'Blade file icon' : 'PHP file icon'"
+                />
                 <span class="min-w-0 truncate">{{
                   language.t().codeFiles[row.id].label
                 }}</span>
@@ -73,9 +86,7 @@
       </div>
     </aside>
 
-    <div
-      class="flex min-h-[min(52dvh,560px)] min-w-0 flex-1 flex-col bg-[#1e1e2e] lg:min-h-0"
-    >
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#1e1e2e]">
       <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div
           class="flex min-h-[40px] flex-nowrap gap-0 overflow-x-auto overscroll-x-contain border-b border-white/10 bg-[#181825]/50"
@@ -99,6 +110,11 @@
                 [class.text-[#6c7086]]="!isActiveFile(id)"
                 (click)="selectTab(id)"
               >
+                <img
+                  class="mr-1.5 inline-block h-4 w-4 object-contain align-middle"
+                  [src]="fileIconPath(id)"
+                  [alt]="isBladeFile(id) ? 'Blade file icon' : 'PHP file icon'"
+                />
                 {{ language.t().codeFiles[id].label }}
               </button>
               <button
@@ -113,7 +129,7 @@
           }
         </div>
 
-        <div class="flex min-h-0 flex-1 overflow-auto">
+        <div class="ide-editor flex min-h-0 flex-1 overflow-x-auto overflow-y-auto">
           <div
             class="sticky left-0 z-[1] select-none border-r border-white/10 bg-[#181825]/40 py-3 pr-2 pl-2 text-right font-mono text-[11px] leading-6 text-[#6c7086] sm:pl-3 sm:text-[12px]"
             aria-hidden="true"
@@ -122,9 +138,7 @@
               <div class="leading-6">{{ n }}</div>
             }
           </div>
-          <div
-            class="min-w-0 flex-1 overflow-x-auto py-3 pr-3 font-mono text-[12px] leading-6 text-[#cdd6f4] sm:pr-4 sm:text-[13px]"
-          >
+          <div class="min-w-0 flex-1 py-3 pr-3 font-mono text-[12px] leading-6 text-[#cdd6f4] sm:pr-4 sm:text-[13px]">
             <div class="whitespace-pre-wrap break-words pl-1">
               @for (token of highlightedTokens(); track $index) {
                 <span [class]="tokenClass(token.type)">{{ token.text }}</span>
@@ -139,7 +153,7 @@
       </div>
 
       <div
-        class="flex min-h-[120px] max-h-[38vh] shrink-0 flex-col border-t border-[#2b2b2b] bg-[#181818]"
+        class="ide-terminal flex h-[220px] max-h-[38vh] min-h-[140px] shrink-0 flex-col border-t border-[#2b2b2b] bg-[#181818]"
         role="region"
         [attr.aria-label]="language.t().ide.panel.terminal"
       >
@@ -226,79 +240,54 @@
           </div>
         </div>
         <div
+          #terminalOutput
           class="min-h-0 flex-1 overflow-y-auto px-3 py-2 font-mono text-[11px] leading-5 sm:text-[12px] sm:leading-5"
           role="document"
         >
           <div
-            class="flex min-h-[1.25rem] flex-wrap items-center gap-x-1 gap-y-1"
+            class="flex min-h-[1.25rem] flex-wrap items-center gap-x-1 gap-y-1 text-[#d8dee9]"
             role="img"
             [attr.aria-label]="language.t().ide.prompt.ariaLabel"
           >
-            <span class="inline-flex items-center text-[#cba6f7]">{{
-              language.t().ide.prompt.user
-            }}</span>
-            <span class="inline-flex items-center text-[#c0caf5]">{{
-              language.t().ide.prompt.inRepo
-            }}</span>
-            <span class="inline-flex items-center text-[#e0af68]">{{
-              language.t().ide.prompt.repoName
-            }}</span>
-            <span class="inline-flex items-center text-[#c0caf5]">{{
-              language.t().ide.prompt.on
-            }}</span>
-            <span class="inline-flex items-center gap-1 text-[#a6e3a1]">
-              <svg
-                class="block h-[1cap] w-[1cap] shrink-0 self-center"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <line x1="6" y1="3" x2="6" y2="15" />
-                <circle cx="18" cy="6" r="3" />
-                <circle cx="6" cy="18" r="3" />
-                <path d="M18 9a9 9 0 0 1-9 9" />
-              </svg>
-              {{ language.t().ide.statusBranch }}
-            </span>
-            <span class="inline-flex items-center text-[#a6e3a1]">{{
-              language.t().ide.prompt.gitAdd
-            }}</span>
-            <span class="inline-flex items-center text-[#eb98af]">/</span>
+            <span class="inline-flex items-center text-[#cba6f7]">{{ language.t().ide.prompt.user }}</span>
+            <span class="inline-flex items-center text-[#d8dee9]">{{ language.t().ide.prompt.inRepo }}</span>
+            <span class="inline-flex items-center text-[#e0af68]">{{ language.t().ide.prompt.repoName }}</span>
+            <span class="inline-flex items-center text-[#d8dee9]">{{ language.t().ide.prompt.on }}</span>
+            <span class="inline-flex items-center text-[#7ee787]">{{ language.t().ide.statusBranch }}</span>
+            <span class="inline-flex items-center text-[#7ee787]">{{ language.t().ide.prompt.gitAdd }}</span>
+            <span class="inline-flex items-center text-[#f7768e]">/</span>
             <span class="inline-flex items-center text-[#f7768e]">{{ language.t().ide.prompt.gitDel }}</span>
-            <span class="inline-flex items-center text-[#c0caf5]">{{
-              language.t().ide.prompt.gitDirty
-            }}</span>
-            <span class="inline-flex items-center text-[#c0caf5]">{{
-              language.t().ide.prompt.via
-            }}</span>
-            <span class="inline-flex items-center gap-1 text-[#a6e3a1]">
-              <svg
-                class="block h-[1cap] w-[1cap] shrink-0 self-center"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <polygon points="8,1.5 13.5,4.75 13.5,11.25 8,14.5 2.5,11.25 2.5,4.75" />
-              </svg>
-              {{ language.t().ide.prompt.nodeVersion }}
-            </span>
+            <span class="inline-flex items-center text-[#d8dee9]">{{ language.t().ide.prompt.gitDirty }}</span>
+            <span class="inline-flex items-center text-[#d8dee9]">{{ language.t().ide.prompt.via }}</span>
+            <span class="inline-flex items-center text-[#7ee787]">{{ language.t().ide.prompt.nodeVersion }}</span>
           </div>
-          <div class="mt-2 flex items-center gap-1.5 text-[12px] sm:text-[13px]">
-            <span class="font-semibold text-[#c0caf5]" aria-hidden="true">&#x276F;</span>
-            <span
-              class="inline-block h-4 w-px shrink-0 bg-[#c0caf5] animate-blink-cursor"
-              aria-hidden="true"
-            ></span>
+          @for (line of terminalEntries(); track $index) {
+            <div class="whitespace-pre-wrap break-words text-[#d8dee9]">{{ line }}</div>
+          }
+          <div
+            class="mt-2 flex min-h-[1.25rem] items-center gap-1.5"
+            role="img"
+            [attr.aria-label]="language.t().ide.prompt.ariaLabel"
+          >
+            <span class="font-semibold text-[#d8dee9]" aria-hidden="true">&#x276F;</span>
+            <input
+              class="flex-1 border-0 bg-transparent p-0 font-mono text-[#d8dee9] outline-none placeholder:text-[#7f8c99]"
+              [value]="terminalInput()"
+              [placeholder]="language.t().ide.terminal.placeholder"
+              (input)="updateTerminalInput($event)"
+              (keydown)="onTerminalKeydown($event)"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+            />
+            <span class="inline-block h-4 w-1.5 shrink-0 bg-[#63e6be] animate-blink-cursor" aria-hidden="true"></span>
           </div>
         </div>
       </div>
 
       <div
-        class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-white/10 bg-[#2563eb] px-3 py-1.5 font-mono text-[10px] text-white sm:text-xs"
+        class="ide-statusbar flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-white/10 bg-[#2563eb] px-3 py-1.5 font-mono text-[10px] text-white sm:text-xs"
       >
         <div class="flex flex-wrap items-center gap-3">
           <span class="inline-flex items-center gap-1">
