@@ -186,8 +186,8 @@ class HeroController extends Controller
     {
         return [
             'name' => 'Marlon Rivas',
-            'title' => 'Full Stack Developer',
-            'tagline' => 'Building scalable and modern web applications',
+            'title' => 'Software Developer',
+            'tagline' => 'Building functional applications and optimizing technological processes',
         ];
     }
 }
@@ -203,8 +203,8 @@ class HeroController extends Controller
     {
         return [
             'name' => 'Marlon Rivas',
-            'title' => 'Full Stack Developer',
-            'tagline' => 'Construyendo aplicaciones web escalables y modernas',
+            'title' => 'Software Developer',
+            'tagline' => 'Desarrollando aplicaciones funcionales y optimizando procesos tecnológicos',
         ];
     }
 }
@@ -225,18 +225,40 @@ class AboutModel extends Model
     public function getProfile(): array
     {
         return [
-            'education' => 'Systems Engineering Student',
+            'education' => [
+                [
+                    'degree' => 'EGRESADO INGENIERÍA SISTEMAS Y COMPUTACIÓN',
+                    'institution' => 'Universidad Dr. Andres Bello',
+                    'period' => '2021 – ACTUALIDAD',
+                ],
+                [
+                    'degree' => 'BACHILLER',
+                    'institution' => 'Instituto Manuel Jose Arce',
+                    'period' => '2019 – 2020',
+                ],
+            ],
             'summary' => [
-                'Hands-on experience building real-world web apps',
-                'Specialized in full-stack development with modern tech',
-                'Focus on clean, maintainable, and scalable code',
-                'Enterprise-level internal tools and systems',
+                'Systems Engineering student and web developer focused on Backend and Frontend',
+                'Passionate about developing functional applications and constantly learning new technologies',
+                'Responsible, self-taught person oriented towards problem-solving through technological solutions',
+            ],
+            'courses' => [
+                'AWS Cloud Management Foundations',
+                'JS from zero to expert',
+            ],
+            'soft_skills' => [
+                'Problem solving',
+                'Teamwork',
+                'Self-taught learning',
+                'Adaptability',
+                'Effective communication',
+                'Logical thinking',
             ],
             'interests' => [
-                'Backend architecture and API design',
-                'Interactive dashboards and analytics',
-                'System integrations and automation',
-                'UI and UX design principles',
+                'Full-stack development (Angular, Laravel, Node.js)',
+                'Process optimization and scalable architecture',
+                'Cloud computing and containerization',
+                'Continuous learning and technological innovation',
             ],
         ];
     }
@@ -258,18 +280,40 @@ class AboutModel extends Model
     public function getProfile(): array
     {
         return [
-            'education' => 'Estudiante de Ingeniería de Sistemas',
+            'education' => [
+                [
+                    'degree' => 'EGRESADO INGENIERÍA SISTEMAS Y COMPUTACIÓN',
+                    'institution' => 'Universidad Dr. Andres Bello',
+                    'period' => '2021 – ACTUALIDAD',
+                ],
+                [
+                    'degree' => 'BACHILLER',
+                    'institution' => 'Instituto Manuel Jose Arce',
+                    'period' => '2019 – 2020',
+                ],
+            ],
             'summary' => [
-                'Experiencia práctica en aplicaciones web reales',
-                'Especialización full-stack con stack moderno',
-                'Código limpio, mantenible y escalable',
-                'Herramientas internas y sistemas empresariales',
+                'Estudiante de Ingeniería en Sistemas y desarrollador web enfocado en Backend y Frontend',
+                'Apasionado por desarrollar aplicaciones funcionales y aprender constantemente nuevas tecnologías',
+                'Persona responsable, autodidacta y orientada a la resolución de problemas mediante soluciones tecnológicas',
+            ],
+            'courses' => [
+                'Fundamentos de gestión de la nube con AWS',
+                'JS de cero a experto',
+            ],
+            'soft_skills' => [
+                'Resolución de problemas',
+                'Trabajo en equipo',
+                'Aprendizaje autodidacta',
+                'Adaptabilidad',
+                'Comunicación efectiva',
+                'Pensamiento lógico',
             ],
             'interests' => [
-                'Arquitectura backend y diseño de APIs',
-                'Paneles interactivos y analíticas',
-                'Integraciones y automatización',
-                'Principios de UI/UX',
+                'Desarrollo Full-stack (Angular, Laravel, Node.js)',
+                'Optimización de procesos y arquitectura escalable',
+                'Cloud computing y dockerización',
+                'Aprendizaje continuo e innovación tecnológica',
             ],
         ];
     }
@@ -296,38 +340,20 @@ return new class extends Migration
 
         DB::table('tech_stack')->insert([
             [
-                'category' => 'frontend',
+                'category' => 'técnicas',
                 'skills' => json_encode([
-                    'angular' => 'Advanced',
-                    'react' => 'Basic',
-                    'javascript' => 'Advanced',
-                    'typescript' => 'Intermediate',
-                    'tailwind_css' => 'Advanced',
-                    'css' => 'Advanced',
-                ]),
-            ],
-            [
-                'category' => 'backend',
-                'skills' => json_encode([
-                    'php' => 'Advanced',
-                    'codeigniter_4' => 'Advanced',
-                    'laravel' => 'Intermediate',
-                    'nodejs' => 'Intermediate',
-                ]),
-            ],
-            [
-                'category' => 'database',
-                'skills' => json_encode([
-                    'mysql' => 'Advanced',
-                    'supabase' => 'Intermediate',
-                ]),
-            ],
-            [
-                'category' => 'tools',
-                'skills' => json_encode([
-                    'bitbucket' => 'Daily use',
-                    'notion' => 'Daily use',
-                    'confluence' => 'Daily use',
+                    'PHP' => 'Advanced',
+                    'JavaScript' => 'Advanced',
+                    'TypeScript' => 'Advanced',
+                    'Node.js' => 'Intermediate',
+                    'Angular' => 'Advanced',
+                    'Laravel' => 'Advanced',
+                    'CodeIgniter 4' => 'Intermediate',
+                    'Next.js' => 'Intermediate',
+                    'MySQL' => 'Advanced',
+                    'Git y GitHub' => 'Daily use',
+                    'Docker' => 'Intermediate',
+                    'HTML y CSS' => 'Advanced',
                 ]),
             ],
         ]);
@@ -360,38 +386,20 @@ return new class extends Migration
 
         DB::table('tech_stack')->insert([
             [
-                'category' => 'frontend',
+                'category' => 'técnicas',
                 'skills' => json_encode([
-                    'angular' => 'Avanzado',
-                    'react' => 'Básico',
-                    'javascript' => 'Avanzado',
-                    'typescript' => 'Intermedio',
-                    'tailwind_css' => 'Avanzado',
-                    'css' => 'Avanzado',
-                ]),
-            ],
-            [
-                'category' => 'backend',
-                'skills' => json_encode([
-                    'php' => 'Avanzado',
-                    'codeigniter_4' => 'Avanzado',
-                    'laravel' => 'Intermedio',
-                    'nodejs' => 'Intermedio',
-                ]),
-            ],
-            [
-                'category' => 'database',
-                'skills' => json_encode([
-                    'mysql' => 'Avanzado',
-                    'supabase' => 'Intermedio',
-                ]),
-            ],
-            [
-                'category' => 'tools',
-                'skills' => json_encode([
-                    'bitbucket' => 'Uso diario',
-                    'notion' => 'Uso diario',
-                    'confluence' => 'Uso diario',
+                    'PHP' => 'Avanzado',
+                    'JavaScript' => 'Avanzado',
+                    'TypeScript' => 'Avanzado',
+                    'Node.js' => 'Intermedio',
+                    'Angular' => 'Avanzado',
+                    'Laravel' => 'Avanzado',
+                    'CodeIgniter 4' => 'Intermedio',
+                    'Next.js' => 'Intermedio',
+                    'MySQL' => 'Avanzado',
+                    'Git y GitHub' => 'Uso diario',
+                    'Docker' => 'Intermedio',
+                    'HTML y CSS' => 'Avanzado',
                 ]),
             ],
         ]);
@@ -417,24 +425,20 @@ class ProjectSeeder extends Seeder
     {
         DB::table('projects')->insert([
             [
-                'name' => 'SkillBridge',
-                'description' => 'Web platform connecting users with skill-building opportunities.',
+                'name' => 'Volunteer Management System',
+                'description' => 'Web platform for managing university volunteers and events.',
                 'features' => json_encode([
-                    'Interactive dashboard with analytics',
-                    'User profile management',
-                    'Modular architecture',
+                    'Volunteer management and university events',
+                    'Student enrollment in social activities',
+                    'Admin-controlled event management for social hours',
                 ]),
-                'tags' => json_encode(['Web App', 'Dashboard', 'Full Stack']),
+                'tags' => json_encode(['JSP', 'Web App', 'University Project']),
             ],
             [
-                'name' => 'Elix-Perfum',
-                'description' => 'Premium e-commerce platform for a perfume brand.',
-                'features' => json_encode([
-                    'Refined product catalog',
-                    'Responsive design',
-                    'Admin tooling',
-                ]),
-                'tags' => json_encode(['E-commerce', 'UI/UX', 'Responsive']),
+                'name' => '[Upcoming Project]',
+                'description' => 'Reserved space for your next personal project.',
+                'features' => json_encode(['Pending implementation']),
+                'tags' => json_encode(['Draft']),
             ],
         ]);
     }
@@ -454,24 +458,20 @@ class ProjectSeeder extends Seeder
     {
         DB::table('projects')->insert([
             [
-                'name' => 'SkillBridge',
-                'description' => 'Plataforma web que conecta usuarios con oportunidades de desarrollo.',
+                'name' => 'Sistema de Gestión de Voluntariados',
+                'description' => 'Plataforma web para la gestión de voluntariados y eventos universitarios.',
                 'features' => json_encode([
-                    'Panel interactivo con analíticas',
-                    'Gestión de perfiles de usuario',
-                    'Arquitectura modular',
+                    'Gestión de plataforma utilizando JSP',
+                    'Sistema de inscripción de estudiantes a actividades sociales',
+                    'Gestión de eventos administrados por usuarios con control de horas sociales',
                 ]),
-                'tags' => json_encode(['Web App', 'Dashboard', 'Full Stack']),
+                'tags' => json_encode(['JSP', 'Web App', 'Proyecto Universitario']),
             ],
             [
-                'name' => 'Elix-Perfum',
-                'description' => 'E-commerce premium para una marca de perfumes.',
-                'features' => json_encode([
-                    'Catálogo de productos refinado',
-                    'Diseño responsive',
-                    'Herramientas de administración',
-                ]),
-                'tags' => json_encode(['E-commerce', 'UI/UX', 'Responsive']),
+                'name' => '[Próximo Proyecto]',
+                'description' => 'Espacio reservado para tu siguiente proyecto personal.',
+                'features' => json_encode(['Pendiente de implementar']),
+                'tags' => json_encode(['Borrador']),
             ],
         ]);
     }
@@ -486,32 +486,49 @@ if (! function_exists('get_experience')) {
     {
         return [
             [
-                'role' => 'Internal web systems',
-                'detail' => 'Developed enterprise-grade internal tools',
+                'category' => 'professional',
+                'period' => 'April 2025 – Present',
+                'role' => 'Software Developer Jr.',
+                'detail' => json_encode([
+                    'Development and maintenance of web applications.',
+                    'Implementation of backend and frontend functionalities.',
+                    'Integration and consumption of APIs.',
+                    'Relational database management.',
+                    'Technical documentation and version control.',
+                    'Participation in deployment and dockerization of projects.',
+                    'Collaborative work using methodologies and development tools.',
+                ]),
             ],
             [
-                'role' => 'Parking management system',
-                'detail' => 'Request-based access control with dashboard analytics',
+                'category' => 'professional',
+                'period' => 'May 2024 – April 2025',
+                'role' => 'Software Developer Internship',
+                'detail' => json_encode([
+                    'Support in the development and integration of APIs.',
+                    'Learning and application of web technologies.',
+                    'Documentation of processes and projects.',
+                    'Support in backend and frontend development tasks.',
+                ]),
             ],
             [
-                'role' => 'Inventory / ERP module',
-                'detail' => 'Integrated with billing for streamlined operations',
+                'category' => 'volunteering',
+                'period' => 'June 2023',
+                'role' => 'IT Support — Central American and Caribbean Games',
+                'detail' => json_encode([
+                    'Monitoring of equipment and access points (APs).',
+                    'Technical support for athletes and event staff.',
+                    'Verification of connectivity and device operation.',
+                ]),
             ],
             [
-                'role' => 'Commercial websites',
-                'detail' => 'Responsive and modern business web presences',
-            ],
-            [
-                'role' => 'Monitoring systems',
-                'detail' => 'API-based infrastructure monitoring (Zabbix)',
-            ],
-            [
-                'role' => 'Cloud image optimization',
-                'detail' => 'Storage and image processing pipelines',
-            ],
-            [
-                'role' => 'Agile collaboration',
-                'detail' => 'Bitbucket, Notion, and Confluence with cross-functional teams',
+                'category' => 'volunteering',
+                'period' => 'January 2023',
+                'role' => 'Volunteer Management System — University Project',
+                'detail' => json_encode([
+                    'Development of a web platform using JSP for managing volunteers and university events.',
+                    'Implementation of a student enrollment system for social activities.',
+                    'Management of events administered by users with social hour control.',
+                ]),
             ],
         ];
     }
@@ -526,32 +543,49 @@ if (! function_exists('get_experience')) {
     {
         return [
             [
-                'role' => 'Sistemas web internos',
-                'detail' => 'Herramientas internas de nivel empresarial',
+                'category' => 'professional',
+                'period' => 'Abril 2025 – Actualidad',
+                'role' => 'Software Developer Jr.',
+                'detail' => json_encode([
+                    'Desarrollo y mantenimiento de aplicaciones web.',
+                    'Implementación de funcionalidades backend y frontend.',
+                    'Integración y consumo de APIs.',
+                    'Manejo de bases de datos relacionales.',
+                    'Documentación técnica y control de versiones.',
+                    'Participación en despliegue y dockerización de proyectos.',
+                    'Trabajo colaborativo utilizando metodologías y herramientas de desarrollo.',
+                ]),
             ],
             [
-                'role' => 'Sistema de estacionamiento',
-                'detail' => 'Control por solicitudes con panel y analíticas',
+                'category' => 'professional',
+                'period' => 'Mayo 2024 – Abril 2025',
+                'role' => 'Pasantía Software Developer',
+                'detail' => json_encode([
+                    'Apoyo en el desarrollo e integración de APIs.',
+                    'Aprendizaje y aplicación de tecnologías web.',
+                    'Documentación de procesos y proyectos.',
+                    'Soporte en tareas de desarrollo backend y frontend.',
+                ]),
             ],
             [
-                'role' => 'Módulo inventario / ERP',
-                'detail' => 'Integrado con facturación para operaciones ágiles',
+                'category' => 'volunteering',
+                'period' => 'Junio 2023',
+                'role' => 'Soporte TI — Juegos Centroamericanos y del Caribe',
+                'detail' => json_encode([
+                    'Monitoreo de equipos y puntos de acceso (APs).',
+                    'Soporte técnico para atletas y personal del evento.',
+                    'Verificación de conectividad y funcionamiento de dispositivos.',
+                ]),
             ],
             [
-                'role' => 'Sitios comerciales',
-                'detail' => 'Presencias web responsive y modernas',
-            ],
-            [
-                'role' => 'Monitoreo',
-                'detail' => 'Infraestructura vía APIs (Zabbix)',
-            ],
-            [
-                'role' => 'Optimización de imágenes en la nube',
-                'detail' => 'Almacenamiento y pipelines de procesamiento',
-            ],
-            [
-                'role' => 'Colaboración ágil',
-                'detail' => 'Bitbucket, Notion y Confluence en equipos multidisciplina',
+                'category' => 'volunteering',
+                'period' => 'Enero 2023',
+                'role' => 'Sistema de Gestión de Voluntariados — Proyecto Universitario',
+                'detail' => json_encode([
+                    'Desarrollo de plataforma web utilizando JSP para la gestión de voluntariados y eventos universitarios.',
+                    'Implementación de sistema de inscripción de estudiantes a actividades sociales.',
+                    'Gestión de eventos administrados por usuarios con control de horas sociales.',
+                ]),
             ],
         ];
     }
@@ -671,14 +705,16 @@ const contactBladeEn = `@extends('layouts.portfolio')
 @section('content')
 <section class="contact">
     <h1>Contact</h1>
-    {{-- hello@marlonrivas.dev — portfolio inquiry --}}
+    {{-- marlonriv003@gmail.com — (503) 7733-7519 --}}
     <ul>
+        <li>Email: marlonriv003@gmail.com</li>
+        <li>Location: San Salvador, El Salvador</li>
         @foreach ($social as $link)
             <li><a href="{{ $link['url'] }}">{{ $link['label'] }}</a></li>
         @endforeach
     </ul>
     <footer>
-        Built with PHP, Laravel, and care for detail.
+        Built with Angular 21, PHP/Laravel (simulated), and passion.
     </footer>
 </section>
 @endsection
@@ -689,14 +725,16 @@ const contactBladeEs = `@extends('layouts.portfolio')
 @section('content')
 <section class="contact">
     <h1>Contacto</h1>
-    {{-- hello@marlonrivas.dev — consulta de portafolio --}}
+    {{-- marlonriv003@gmail.com — (503) 7733-7519 --}}
     <ul>
+        <li>Email: marlonriv003@gmail.com</li>
+        <li>Ubicación: San Salvador, El Salvador</li>
         @foreach ($social as $link)
             <li><a href="{{ $link['url'] }}">{{ $link['label'] }}</a></li>
         @endforeach
     </ul>
     <footer>
-        Hecho con PHP, Laravel y atención al detalle.
+        Hecho con Angular 21, PHP/Laravel (simulado) y pasión.
     </footer>
 </section>
 @endsection

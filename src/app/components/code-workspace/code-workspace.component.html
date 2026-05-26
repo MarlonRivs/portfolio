@@ -29,6 +29,35 @@
         <option value="light">{{ themeLabel('light') }}</option>
       </select>
       <app-language-toggle />
+
+      <button
+        type="button"
+        class="ml-2 flex items-center gap-1.5 rounded border border-white/15 bg-[#11111b] px-2 py-1 font-mono text-[11px] text-[#cdd6f4] transition-colors hover:bg-[#313244] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#89b4fa]"
+        [ngClass]="!isExplorerOpen() ? 'bg-[#313244]' : ''"
+        (click)="toggleExplorer()"
+        title="Toggle Explorer"
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7h18" />
+          <path d="M3 12h18" />
+          <path d="M3 17h18" />
+        </svg>
+        <span class="hidden sm:inline">Explorer</span>
+      </button>
+      <button
+        type="button"
+        class="ml-2 flex items-center gap-1.5 rounded border border-white/15 bg-[#11111b] px-2 py-1 font-mono text-[11px] text-[#cdd6f4] transition-colors hover:bg-[#313244] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#89b4fa]"
+        [class.bg-[#89b4fa]]="isPreviewMode()"
+        [class.text-[#11111b]]="isPreviewMode()"
+        (click)="togglePreview()"
+        title="Toggle Live Preview"
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+        <span class="hidden sm:inline">Live Preview</span>
+      </button>
       <div
         class="hidden h-2 w-14 shrink-0 items-center justify-end gap-1 sm:flex"
         aria-hidden="true"
@@ -40,51 +69,60 @@
     </div>
   </div>
 
-  <div class="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
-    <aside
-      class="ide-explorer max-h-[40vh] overflow-y-auto border-b border-white/10 bg-[#181825]/85 lg:max-h-none lg:border-b-0 lg:border-r"
-      [attr.aria-label]="language.t().ide.explorer"
-    >
-      <div
-        class="sticky top-0 z-[1] bg-[#181825]/95 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#6c7086]"
+  <div
+    class="grid min-h-0 flex-1 grid-cols-1 overflow-hidden"
+    [ngClass]="
+      isExplorerOpen()
+        ? 'lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]'
+        : 'lg:grid-cols-1'
+    "
+  >
+    @if (isExplorerOpen()) {
+      <aside
+        class="ide-explorer max-h-[40vh] overflow-y-auto border-b border-white/10 bg-[#181825]/85 lg:max-h-none lg:border-b-0 lg:border-r"
+        [attr.aria-label]="language.t().ide.explorer"
       >
-        {{ language.t().ide.explorer }}
-      </div>
-      <div class="px-1 pb-3 font-mono text-[13px]">
-        @for (row of explorerRows; track $index) {
-          @if (row.type === 'folder') {
-            <div
-              class="flex items-center gap-1 py-0.5 text-[#bac2de]"
-              [style.padding-left.px]="8 + row.depth * 10"
-            >
-              <span class="text-[10px] text-[#6c7086]">&#9660;</span>
-              <span class="truncate">{{ row.name }}</span>
-            </div>
-          } @else if (row.id) {
-            <div [style.padding-left.px]="8 + row.depth * 10">
-              <button
-                type="button"
-                class="flex w-full max-w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#89b4fa]"
-                [class.bg-[#313244]]="isActiveFile(row.id)"
-                [class.text-white]="isActiveFile(row.id)"
-                [class.text-[#bac2de]]="!isActiveFile(row.id)"
-                [class.hover:bg-white/5]="!isActiveFile(row.id)"
-                (click)="openFile(row.id)"
+        <div
+          class="sticky top-0 z-[1] bg-[#181825]/95 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#6c7086]"
+        >
+          {{ language.t().ide.explorer }}
+        </div>
+        <div class="px-1 pb-3 font-mono text-[13px]">
+          @for (row of explorerRows; track $index) {
+            @if (row.type === 'folder') {
+              <div
+                class="flex items-center gap-1 py-0.5 text-[#bac2de]"
+                [style.padding-left.px]="8 + row.depth * 10"
               >
-                <img
-                  class="h-4 w-4 shrink-0 object-contain"
-                  [src]="fileIconPath(row.id)"
-                  [alt]="isBladeFile(row.id) ? 'Blade file icon' : 'PHP file icon'"
-                />
-                <span class="min-w-0 truncate">{{
-                  language.t().codeFiles[row.id].label
-                }}</span>
-              </button>
-            </div>
+                <span class="text-[10px] text-[#6c7086]">&#9660;</span>
+                <span class="truncate">{{ row.name }}</span>
+              </div>
+            } @else if (row.id) {
+              <div [style.padding-left.px]="8 + row.depth * 10">
+                <button
+                  type="button"
+                  class="flex w-full max-w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#89b4fa]"
+                  [class.bg-[#313244]]="isActiveFile(row.id)"
+                  [class.text-white]="isActiveFile(row.id)"
+                  [class.text-[#bac2de]]="!isActiveFile(row.id)"
+                  [class.hover:bg-white/5]="!isActiveFile(row.id)"
+                  (click)="openFile(row.id)"
+                >
+                  <img
+                    class="h-4 w-4 shrink-0 object-contain"
+                    [src]="fileIconPath(row.id)"
+                    [alt]="isBladeFile(row.id) ? 'Blade file icon' : 'PHP file icon'"
+                  />
+                  <span class="min-w-0 truncate">{{
+                    language.t().codeFiles[row.id].label
+                  }}</span>
+                </button>
+              </div>
+            }
           }
-        }
-      </div>
-    </aside>
+        </div>
+      </aside>
+    }
 
     <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#1e1e2e]">
       <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -129,26 +167,42 @@
           }
         </div>
 
-        <div class="ide-editor flex min-h-0 flex-1 overflow-x-auto overflow-y-auto">
+        <div
+          class="grid min-h-0 flex-1 grid-cols-1 overflow-hidden transition-all duration-300"
+          [ngClass]="isPreviewMode() ? 'lg:grid-cols-[1fr_1.5fr]' : ''"
+        >
+          <!-- Editor Section -->
           <div
-            class="sticky left-0 z-[1] select-none border-r border-white/10 bg-[#181825]/40 py-3 pr-2 pl-2 text-right font-mono text-[11px] leading-6 text-[#6c7086] sm:pl-3 sm:text-[12px]"
-            aria-hidden="true"
+            class="ide-editor flex min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto border-r-0"
+            [ngClass]="isPreviewMode() ? 'lg:border-r lg:border-white/5' : ''"
           >
-            @for (n of lineNumbers(); track $index) {
-              <div class="leading-6">{{ n }}</div>
-            }
-          </div>
-          <div class="min-w-0 flex-1 py-3 pr-3 font-mono text-[12px] leading-6 text-[#cdd6f4] sm:pr-4 sm:text-[13px]">
-            <div class="whitespace-pre-wrap break-words pl-1">
-              @for (token of highlightedTokens(); track $index) {
-                <span [class]="tokenClass(token.type)">{{ token.text }}</span>
+            <div
+              class="sticky left-0 z-[1] select-none border-r border-white/10 bg-[#181825]/40 py-3 pr-2 pl-2 text-right font-mono text-[11px] leading-6 text-[#6c7086] sm:pl-3 sm:text-[12px]"
+              aria-hidden="true"
+            >
+              @for (n of lineNumbers(); track $index) {
+                <div class="leading-6">{{ n }}</div>
               }
-              <span
-                class="ml-px inline-block min-h-[1.1em] min-w-[0.55ch] translate-y-[2px] bg-[#89b4fa] align-baseline animate-blink-cursor"
-                aria-hidden="true"
-              ></span>
+            </div>
+            <div class="min-w-0 flex-1 py-3 pr-3 font-mono text-[12px] leading-6 text-[#cdd6f4] sm:pr-4 sm:text-[13px]">
+              <div class="whitespace-pre-wrap break-words pl-1">
+                @for (token of highlightedTokens(); track $index) {
+                  <span [class]="tokenClass(token.type)">{{ token.text }}</span>
+                }
+                <span
+                  class="ml-px inline-block min-h-[1.1em] min-w-[0.55ch] translate-y-[2px] bg-[#89b4fa] align-baseline animate-blink-cursor"
+                  aria-hidden="true"
+                ></span>
+              </div>
             </div>
           </div>
+
+          <!-- Live Preview Section -->
+          @if (isPreviewMode()) {
+            <div class="hidden min-h-0 min-w-0 overflow-y-auto bg-slate-100 lg:block">
+              <app-cv-preview />
+            </div>
+          }
         </div>
       </div>
 

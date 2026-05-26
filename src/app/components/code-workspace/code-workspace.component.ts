@@ -8,6 +8,8 @@ import {
   viewChild,
 } from '@angular/core';
 
+import { NgClass } from '@angular/common';
+
 import {
   editorTokenClass,
   highlightCode,
@@ -20,10 +22,11 @@ import {
   type PortfolioFileId,
 } from '../../i18n/portfolio.translations';
 import { LanguageToggleComponent } from '../language-toggle/language-toggle.component';
+import { CvPreviewComponent } from '../cv-preview/cv-preview';
 
 @Component({
   selector: 'app-code-workspace',
-  imports: [LanguageToggleComponent],
+  imports: [NgClass, LanguageToggleComponent, CvPreviewComponent],
   templateUrl: './code-workspace.component.html',
   host: {
     class: 'flex min-h-0 min-w-0 flex-1 flex-col bg-[#0f0f1a]',
@@ -42,6 +45,10 @@ export class CodeWorkspaceComponent {
   protected readonly openTabs = signal<PortfolioFileId[]>([this.defaultFileId]);
 
   protected readonly activeTab = signal<PortfolioFileId>(this.defaultFileId);
+
+  protected readonly isPreviewMode = signal(false);
+
+  protected readonly isExplorerOpen = signal(true);
 
   protected readonly visibleLength = signal(0);
   protected readonly terminalInput = signal('');
@@ -176,6 +183,14 @@ export class CodeWorkspaceComponent {
 
   protected setTheme(id: 'catppuccin' | 'vsDark' | 'nord' | 'light'): void {
     this.activeThemeId.set(id);
+  }
+
+  protected togglePreview(): void {
+    this.isPreviewMode.update((v) => !v);
+  }
+
+  protected toggleExplorer(): void {
+    this.isExplorerOpen.update((v) => !v);
   }
 
   protected onThemeChange(event: Event): void {
